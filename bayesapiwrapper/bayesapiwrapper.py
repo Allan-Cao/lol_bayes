@@ -69,7 +69,6 @@ class BayesApiWrapper(object):
         if type(tags) == list:
             tags = ",".join(tags)
         from_timestamp, to_timestamp = self.process_datetime(from_timestamp), self.process_datetime(to_timestamp)
-        print(from_timestamp)
         params = {"from": from_timestamp, "to": to_timestamp, "tags": tags, "page": page,
                   "size": size, "team1": team1, "team2": team2}
         game_list = self.do_api_call("GET", "emh/v1/games", params)
