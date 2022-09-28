@@ -37,12 +37,16 @@ class BayesApiWrapper(object):
             json.dump(self.tokens, f, ensure_ascii=False)
 
     def get_game_summary(self, game_rpgid):
-        summary_url = self.do_api_call("GET", f"emh/v1/games/{game_rpgid}/download?type=GAMH_SUMMARY")["url"]
-        return requests.get(summary_url).json()
+        summary = self.get_game_asset(game_rpgid, "GAMH_SUMMARY")
+        return summary.json()
 
     def get_game_details(self, game_rpgid):
-        details_url = self.do_api_call("GET", f"emh/v1/games/{game_rpgid}/download?type=GAMH_DETAILS")["url"]
-        return requests.get(details_url).json()
+        details = self.get_game_asset(game_rpgid, "GAMH_DETAILS")
+        return details.json()
+
+    def get_game_asset(self, game_rpgid, asset_name):
+        asset_url = self.do_api_call(f"GET", f"emh/v1/games/{game_rpgid}/download", data={"type": asset_name})["url"]
+        return requests.get(asset_url)
 
     def get_game(self, game_rpgid):
         summary = self.get_game_summary(game_rpgid)
