@@ -17,22 +17,28 @@ class BayesApiWrapper(object):
         self.credentials = None
 
     def load_credentials(self):
+        if not os.path.isfile(self.credentials_file):
+            print("The credentials file does not exist yet, let's create it")
+            email = input("Bayes username: ")
+            password = input("Bayes password: ")
+            with open(file=self.credentials_file, mode="w+", encoding="utf8") as f:
+                json.dump({"username": email, "password": password}, f, ensure_ascii=False)
         with open(file=self.credentials_file, mode="r+", encoding="utf8") as f:
             self.credentials = json.load(f)
 
     def load_tokens(self):
         if not os.path.exists(self.config_path):
             os.makedirs(self.config_path)
+        if not os.path.isfile(self.tokens_file):
             with open(file=self.tokens_file, mode="w+", encoding="utf8") as f:
                 json.dump({}, f, ensure_ascii=False)
-            email = input("Bayes email: ")
-            password = input("Bayes password: ")
-            with open(file=self.credentials_file, mode="w+", encoding="utf8") as f:
-                json.dump({"username": email, "password": password}, f, ensure_ascii=False)
         with open(file=self.tokens_file, mode="r+", encoding="utf8") as f:
             self.tokens = json.load(f)
 
-    def save_tokens(self):
+    def store_tokens(self, data):
+        self.tokens = {"accessToken": data["accessToken"],
+                       "refreshToken": data["refreshToken"],
+                       "expires": datetime.now().timestamp() + data["expiresIn"]}
         with open(file=self.tokens_file, mode="w+", encoding="utf8") as f:
             json.dump(self.tokens, f, ensure_ascii=False)
 
@@ -49,9 +55,13 @@ class BayesApiWrapper(object):
             self.do_login()
         if self.should_refresh():
             data = self.do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]})
-            self.tokens = {"accessToken": data["accessToken"], "refreshToken": data["refreshToken"],
-                           "expires": datetime.now().timestamp() + data["expiresIn"]}
-            self.save_tokens()
+            self.store_tokens(data)
+
+    def do_login(self):
+        self.load_credentials()
+        data = self.do_api_call("POST", "auth/login", {"username": self.credentials["username"],
+                                                       "password": self.credentials["password"]})
+        self.store_tokens(data)
 
     def get_game_summary(self, game_rpgid):
         summary = self.get_game_asset(game_rpgid, "GAMH_SUMMARY")
@@ -93,14 +103,6 @@ class BayesApiWrapper(object):
                   "size": size, "team1": team1, "team2": team2}
         game_list = self.do_api_call("GET", "emh/v1/games", params)
         return game_list
-
-    def do_login(self):
-        self.load_credentials()
-        data = self.do_api_call("POST", "auth/login", {"username": self.credentials["username"],
-                                                       "password": self.credentials["password"]})
-        self.tokens = {"accessToken": data["accessToken"], "refreshToken": data["refreshToken"],
-                       "expires": datetime.now().timestamp() + data["expiresIn"]}
-        self.save_tokens()
 
     def get_headers(self):
         self.ensure_login()
