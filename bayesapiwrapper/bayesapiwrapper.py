@@ -64,8 +64,7 @@ class BayesApiWrapper(object):
     def get_game_list(self, *, tags: Optional[Union[str, list]] = None,
                       from_timestamp: Optional[Union[datetime, str, int, float]] = None,
                       to_timestamp: Optional[Union[datetime, str, int, float]] = None, page: Optional[int] = None,
-                      size: Optional[int] = None, team1: Optional[str] = None, team2: Optional[str] = None,
-                      full_list: bool = None):
+                      size: Optional[int] = None, team1: Optional[str] = None, team2: Optional[str] = None):
         if type(tags) == list:
             tags = ",".join(tags)
         from_timestamp, to_timestamp = self.process_datetime(from_timestamp), self.process_datetime(to_timestamp)
