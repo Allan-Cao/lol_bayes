@@ -36,6 +36,23 @@ class BayesApiWrapper(object):
         with open(file=self.tokens_file, mode="w+", encoding="utf8") as f:
             json.dump(self.tokens, f, ensure_ascii=False)
 
+    def should_refresh(self):
+        expires = datetime.fromtimestamp(self.tokens["expires"])
+        if expires - datetime.now() <= timedelta(minutes=5):
+            return True
+        return False
+
+    def ensure_login(self):
+        if self.tokens is None:
+            self.load_tokens()
+        if "accessToken" not in self.tokens:
+            self.do_login()
+        if self.should_refresh():
+            data = self.do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]})
+            self.tokens = {"accessToken": data["accessToken"], "refreshToken": data["refreshToken"],
+                           "expires": datetime.now().timestamp() + data["expiresIn"]}
+            self.save_tokens()
+
     def get_game_summary(self, game_rpgid):
         summary = self.get_game_asset(game_rpgid, "GAMH_SUMMARY")
         return summary.json()
@@ -76,23 +93,6 @@ class BayesApiWrapper(object):
                   "size": size, "team1": team1, "team2": team2}
         game_list = self.do_api_call("GET", "emh/v1/games", params)
         return game_list
-
-    def should_refresh(self):
-        expires = datetime.fromtimestamp(self.tokens["expires"])
-        if expires - datetime.now() <= timedelta(minutes=5):
-            return True
-        return False
-
-    def ensure_login(self):
-        if self.tokens is None:
-            self.load_tokens()
-        if "accessToken" not in self.tokens:
-            self.do_login()
-        if self.should_refresh():
-            data = self.do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]})
-            self.tokens = {"accessToken": data["accessToken"], "refreshToken": data["refreshToken"],
-                           "expires": datetime.now().timestamp() + data["expiresIn"]}
-            self.save_tokens()
 
     def do_login(self):
         self.load_credentials()
