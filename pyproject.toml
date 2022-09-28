@@ -1,13 +1,16 @@
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
-
-[project]
+[tool.poetry]
 name = "bayesapiwrapper"
 version = "0.1.4"
-authors = [
-  { name="ArbolitoLoco", email="arbolitoloco1@protonmail.com" },
-]
+description = ""
+authors = ["Santiago Kozak <santikzk1406@gmail.com>"]
+license = "GPLv3"
 readme = "README.md"
-license = { file="LICENSE" }
-requires-python = ">=3.9"
+
+[tool.poetry.dependencies]
+python = "^3.9"
+requests = "^2.28.1"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
