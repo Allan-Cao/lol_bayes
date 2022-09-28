@@ -117,7 +117,7 @@ class BayesApiWrapper(object):
             raise ValueError("HTTP Method must be GET or POST.")
         if response.status_code == 401 and allow_retry:
             self.ensure_login()
-            self.do_api_call(method, service, data, allow_retry=False)
+            return self.do_api_call(method, service, data, allow_retry=False)
         if response.status_code != 200:
             response.raise_for_status()
         return response.json()
