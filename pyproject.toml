@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bayesapiwrapper"
-version = "0.1.4"
+version = "0.1.5"
 description = ""
 authors = ["Santiago Kozak <santikzk1406@gmail.com>"]
 license = "GPLv3"
