@@ -16,7 +16,7 @@ class BayesApiWrapper(object):
         self.tokens = None
         self.credentials = None
 
-    def load_credentials(self):
+    def _load_credentials(self):
         if not os.path.isfile(self.credentials_file):
             print("The credentials file does not exist yet, let's create it")
             email = input("Bayes username: ")
@@ -26,7 +26,7 @@ class BayesApiWrapper(object):
         with open(file=self.credentials_file, mode="r+", encoding="utf8") as f:
             self.credentials = json.load(f)
 
-    def load_tokens(self):
+    def _load_tokens(self):
         if not os.path.exists(self.config_path):
             os.makedirs(self.config_path)
         if not os.path.isfile(self.tokens_file):
@@ -35,33 +35,35 @@ class BayesApiWrapper(object):
         with open(file=self.tokens_file, mode="r+", encoding="utf8") as f:
             self.tokens = json.load(f)
 
-    def store_tokens(self, data):
+    def _store_tokens(self, data):
         self.tokens = {"accessToken": data["accessToken"],
                        "refreshToken": data["refreshToken"],
                        "expires": datetime.now().timestamp() + data["expiresIn"]}
         with open(file=self.tokens_file, mode="w+", encoding="utf8") as f:
             json.dump(self.tokens, f, ensure_ascii=False)
 
-    def should_refresh(self):
+    def _should_refresh(self):
         expires = datetime.fromtimestamp(self.tokens["expires"])
         if expires - datetime.now() <= timedelta(minutes=5):
             return True
         return False
 
-    def ensure_login(self):
+    def _ensure_login(self):
         if self.tokens is None:
-            self.load_tokens()
+            self._load_tokens()
         if "accessToken" not in self.tokens:
-            self.do_login()
-        if self.should_refresh():
-            data = self.do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]})
-            self.store_tokens(data)
+            self._do_login()
+        if self._should_refresh():
+            data = self._do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]},
+                                     ensure_login=False)
+            self._store_tokens(data)
 
-    def do_login(self):
-        self.load_credentials()
-        data = self.do_api_call("POST", "auth/login", {"username": self.credentials["username"],
-                                                       "password": self.credentials["password"]})
-        self.store_tokens(data)
+    def _do_login(self):
+        self._load_credentials()
+        data = self._do_api_call("POST", "auth/login", {"username": self.credentials["username"],
+                                                        "password": self.credentials["password"]},
+                                 ensure_login=False)
+        self._store_tokens(data)
 
     def get_game_summary(self, game_rpgid):
         summary = self.get_game_asset(game_rpgid, "GAMH_SUMMARY")
@@ -72,7 +74,7 @@ class BayesApiWrapper(object):
         return details.json()
 
     def get_game_asset(self, game_rpgid, asset_name):
-        asset_url = self.do_api_call(f"GET", f"emh/v1/games/{game_rpgid}/download", data={"type": asset_name})["url"]
+        asset_url = self._do_api_call(f"GET", f"emh/v1/games/{game_rpgid}/download", data={"type": asset_name})["url"]
         return requests.get(asset_url)
 
     def get_game(self, game_rpgid):
@@ -81,7 +83,7 @@ class BayesApiWrapper(object):
         return summary, details
 
     @staticmethod
-    def process_datetime(date):
+    def _process_datetime(date):
         if not date:
             return date
         if isinstance(date, int or float):
@@ -98,28 +100,26 @@ class BayesApiWrapper(object):
                       size: Optional[int] = None, team1: Optional[str] = None, team2: Optional[str] = None):
         if type(tags) == list:
             tags = ",".join(tags)
-        from_timestamp, to_timestamp = self.process_datetime(from_timestamp), self.process_datetime(to_timestamp)
+        from_timestamp, to_timestamp = self._process_datetime(from_timestamp), self._process_datetime(to_timestamp)
         params = {"from": from_timestamp, "to": to_timestamp, "tags": tags, "page": page,
                   "size": size, "team1": team1, "team2": team2}
-        game_list = self.do_api_call("GET", "emh/v1/games", params)
+        game_list = self._do_api_call("GET", "emh/v1/games", params)
         return game_list
 
-    def get_headers(self):
-        self.ensure_login()
-        if not self.tokens.get("accessToken"):
-            raise Exception("accessToken can't be found.")
+    def _get_headers(self):
         return {"Authorization": f"Bearer {self.tokens['accessToken']}"}
 
-    def do_api_call(self, method, service, data=None, *, allow_retry: bool = True):
+    def _do_api_call(self, method, service, data=None, *, allow_retry: bool = True, ensure_login: bool = True):
+        if ensure_login:
+            self._ensure_login()
         if method == "GET":
-            response = requests.get(self.endpoint + service, headers=self.get_headers(), params=data)
+            response = requests.get(self.endpoint + service, headers=self._get_headers(), params=data)
         elif method == "POST":
             response = requests.post(self.endpoint + service, json=data)
         else:
             raise ValueError("HTTP Method must be GET or POST.")
         if response.status_code == 401 and allow_retry:
-            self.ensure_login()
-            return self.do_api_call(method, service, data, allow_retry=False)
+            return self._do_api_call(method, service, data, allow_retry=False)
         if response.status_code != 200:
             response.raise_for_status()
         return response.json()
