@@ -5,8 +5,10 @@ import os
 from typing import Optional, Union
 import pytz
 
+
 class NotFoundError(Exception):
     pass
+
 
 class BayesApiWrapper(object):
     config_path = os.path.join(os.path.expanduser('~'), '.config', 'bayesapiwrapper')
