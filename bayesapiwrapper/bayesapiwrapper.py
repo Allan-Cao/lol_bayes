@@ -5,6 +5,8 @@ import os
 from typing import Optional, Union
 import pytz
 
+class NotFoundError(Exception):
+    pass
 
 class BayesApiWrapper(object):
     config_path = os.path.join(os.path.expanduser('~'), '.config', 'bayesapiwrapper')
@@ -120,6 +122,7 @@ class BayesApiWrapper(object):
             raise ValueError("HTTP Method must be GET or POST.")
         if response.status_code == 401 and allow_retry:
             return self._do_api_call(method, service, data, allow_retry=False)
-        if response.status_code != 200:
-            response.raise_for_status()
+        elif response.status_code == 404:
+            raise NotFoundError
+        response.raise_for_status()
         return response.json()
