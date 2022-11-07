@@ -58,9 +58,16 @@ class BayesApiWrapper(object):
         if "accessToken" not in self.tokens:
             self._do_login()
         if self._should_refresh():
+            self._refresh_token()
+
+    def _refresh_token(self):
+        # This ugly try/except is due to bayes returning 429 when trying to refresh token
+        try:
             data = self._do_api_call("POST", "auth/refresh", {"refreshToken": self.tokens["refreshToken"]},
                                      ensure_login=False)
             self._store_tokens(data)
+        except requests.HTTPError:
+            self._do_login()
 
     def _do_login(self):
         self._load_credentials()
