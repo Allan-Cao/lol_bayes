@@ -1,1 +1,1 @@
-import bayesapiwrapper.bayesapiwrapper
+from bayesapiwrapper.bayesapiwrapper import BayesApiWrapper, NotFoundError
