@@ -177,7 +177,18 @@ class BayesApiWrapper(object):
     def _get_headers(self):
         return {"Authorization": f"Bearer {self.tokens['accessToken']}"}
 
-    @backoff.on_exception(backoff.expo, TooManyRequests, max_time=60)
+    @backoff.on_exception(
+        backoff.expo,
+        (
+            JSONDecodeError,
+            ConnectionError,
+            ConnectTimeout,
+            Timeout,
+            RequestException,
+            ReadTimeout,
+        ),
+        max_time=60,
+    )
     def _do_api_call(
         self,
         method,
