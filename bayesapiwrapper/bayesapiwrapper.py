@@ -216,10 +216,10 @@ class BayesApiWrapper(object):
         if response.status_code == 401:
             if allow_retry:
                 return self._do_api_call(method, service, data, allow_retry=False)
-            raise UnauthorizedError
+            raise UnauthorizedError()
         elif response.status_code == 429:
-            raise TooManyRequests
+            raise TooManyRequests()
         elif response.status_code == 404:
-            raise NotFoundError
+            raise NotFoundError()
         response.raise_for_status()
         return response.json()
