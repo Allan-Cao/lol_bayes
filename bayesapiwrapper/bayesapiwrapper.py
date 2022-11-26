@@ -4,7 +4,6 @@ from requests.exceptions import (
     ConnectionError,
     ConnectTimeout,
     Timeout,
-    RequestException,
     ReadTimeout,
 )
 import json
@@ -20,6 +19,10 @@ class NotFoundError(Exception):
 
 
 class TooManyRequests(Exception):
+    pass
+
+
+class UnauthorizedError(Exception):
     pass
 
 
@@ -78,7 +81,6 @@ class BayesApiWrapper(object):
             self._refresh_token()
 
     def _refresh_token(self):
-        # This ugly try/except is due to bayes returning 429 when trying to refresh token
         try:
             if self.tokens is None:
                 self._load_tokens()
@@ -87,9 +89,10 @@ class BayesApiWrapper(object):
                 "auth/refresh",
                 {"refreshToken": self.tokens["refreshToken"]},
                 ensure_login=False,
+                allow_retry=False,
             )
             self._store_tokens(data)
-        except requests.HTTPError:
+        except UnauthorizedError:
             self._do_login()
 
     def _do_login(self):
@@ -102,6 +105,7 @@ class BayesApiWrapper(object):
                 "password": self.credentials["password"],
             },
             ensure_login=False,
+            allow_retry=False,
         )
         self._store_tokens(data)
 
@@ -118,7 +122,6 @@ class BayesApiWrapper(object):
             ConnectionError,
             ConnectTimeout,
             Timeout,
-            RequestException,
             ReadTimeout,
         ),
         max_time=60,
@@ -175,6 +178,8 @@ class BayesApiWrapper(object):
         return game_list
 
     def _get_headers(self):
+        if not self.tokens:
+            self._load_tokens()
         return {"Authorization": f"Bearer {self.tokens['accessToken']}"}
 
     @backoff.on_exception(
@@ -184,8 +189,8 @@ class BayesApiWrapper(object):
             ConnectionError,
             ConnectTimeout,
             Timeout,
-            RequestException,
             ReadTimeout,
+            TooManyRequests,
         ),
         max_time=60,
     )
@@ -208,8 +213,10 @@ class BayesApiWrapper(object):
             response = requests.post(self.endpoint + service, json=data)
         else:
             raise ValueError("HTTP Method must be GET or POST.")
-        if response.status_code == 401 and allow_retry:
-            return self._do_api_call(method, service, data, allow_retry=False)
+        if response.status_code == 401:
+            if allow_retry:
+                return self._do_api_call(method, service, data, allow_retry=False)
+            raise UnauthorizedError
         elif response.status_code == 429:
             raise TooManyRequests
         elif response.status_code == 404:
