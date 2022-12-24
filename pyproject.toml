@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "bayesapiwrapper"
-version = "0.1.6"
-description = ""
+name = "bayes_lol_client"
+version = "1.0.0"
+description = "Wrapper for Bayes League of Legends API"
 authors = ["Santiago Kozak <kozaksantiago@gmail.com>"]
 license = "GPLv3"
 readme = "README.md"
@@ -10,7 +10,7 @@ readme = "README.md"
 python = "^3.9"
 requests = "^2.28.1"
 backoff = "^2.2.1"
-
+pytz = "^2022.7"
 
 [build-system]
 requires = ["poetry-core"]
