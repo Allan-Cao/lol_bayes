@@ -18,7 +18,9 @@ class BayesEMH(object):
     endpoint = "https://lolesports-api.bayesesports.com/"
 
     def __init__(self, username=None, password=None):
-        self.api = BayesAPIClient(endpoint=self.endpoint, username=username, password=password)
+        self.api = BayesAPIClient(
+            endpoint=self.endpoint, username=username, password=password
+        )
 
     def get_game_summary(self, platform_game_id):
         return self.get_asset(platform_game_id, "GAMH_SUMMARY").json()
@@ -46,7 +48,9 @@ class BayesEMH(object):
 
     def get_asset(self, platform_game_id, asset_name):
         asset_url = self.api.do_api_call(
-            f"GET", f"emh/v1/games/{platform_game_id}/download", data={"type": asset_name}
+            f"GET",
+            f"emh/v1/games/{platform_game_id}/download",
+            data={"type": asset_name},
         )["url"]
         return self.download_game_asset(asset_url)
 
