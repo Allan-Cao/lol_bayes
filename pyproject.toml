@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "bayes_lol_client"
-version = "1.0.0"
+version = "1.0.1"
 description = "Wrapper for Bayes League of Legends API"
 authors = ["Santiago Kozak <kozaksantiago@gmail.com>"]
 homepage = "https://github.com/arbolitoloco1/bayes_lol_client"
