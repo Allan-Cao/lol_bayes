@@ -9,18 +9,18 @@ from datetime import datetime
 class BayesEMH(object):
     """
     This class makes requests to the /emh/v1 endpoint in the Bayes API.
-    Useful to get summary/details/replay files for professional games.
+    Useful to get summary/details/replay files for professional games
     """
     endpoint = "https://lolesports-api.bayesesports.com/emh/v1/"
     DEFAULT_MAX_PAGE_SIZE = 500
 
     def __init__(
         self,
-        username: str = None,
-        password: str = None,
-        wait_on_ratelimit: bool = True,
-        retry_interval: int = 2,
-        max_retries: int = 5,
+        username: Optional[str] = None,
+        password: Optional[str] = None,
+        wait_on_ratelimit: Optional[bool] = True,
+        retry_interval: Optional[int] = 2,
+        max_retries: Optional[int] = 5,
     ):
         self.api = BayesAPIClient(
             endpoint=self.endpoint,
@@ -34,6 +34,7 @@ class BayesEMH(object):
     def get_game_summary(self, platform_game_id: str) -> dict:
         """
         Returns the game summary as a json file
+
         :param platform_game_id: A Riot esports game ID
         :return: The game summary as a json file
         """
@@ -42,14 +43,16 @@ class BayesEMH(object):
     def get_game_details(self, platform_game_id: str) -> dict:
         """
         Returns the game details (timeline) as a json file
+
         :param platform_game_id: A Riot esports game ID
         :return: The game details as a json file
         """
         return self.get_asset(platform_game_id, "GAMH_DETAILS").json()
 
-    def get_game_replay(self, platform_game_id: str) -> Response.content:
+    def get_game_replay(self, platform_game_id: str) -> bytes:
         """
         Returns a replay file as bytes which can later be saved locally
+
         :param platform_game_id: A Riot esports game ID
         :return: Replay file as bytes
         """
@@ -58,6 +61,7 @@ class BayesEMH(object):
     def get_asset(self, platform_game_id: str, asset_name: str) -> Response:
         """
         Gets a generic asset for a game by its name (SUMMARY, DETAILS, or REPLAY)
+
         :param platform_game_id: A Riot esports game ID
         :param asset_name: The name of the asset to return (GAMH_SUMMARY, GAMH_DETAILS, ROFL_REPLAY)
         :return: An asset for a specific game
@@ -72,6 +76,7 @@ class BayesEMH(object):
     def get_game_data(self, platform_game_id: str) -> tuple:
         """
         Returns both the game summary and details as a tuple
+
         :param platform_game_id: A Riot esports game ID
         :return: Game summary and details as a tuple
         """
@@ -79,9 +84,10 @@ class BayesEMH(object):
         details = self.get_game_details(platform_game_id)
         return summary, details
 
-    def get_tags_list(self) -> list:
+    def get_tags_list(self) -> List[str]:
         """
         Gets all the available game tags in EMH
+
         :return: A list of game tags
         """
         return self.api.do_api_call("GET", "tags")
@@ -89,6 +95,7 @@ class BayesEMH(object):
     def get_games_info(self, platform_game_ids: Union[str, list]) -> dict:
         """
         Gets basic metadata for a list of games
+
         :param platform_game_ids: Riot esports game IDs as a list or a comma-separated string
         :return: A dict containing each platform game ID as a key
         """
@@ -106,6 +113,7 @@ class BayesEMH(object):
     def get_game_info(self, platform_game_id: str) -> dict:
         """
         Gets basic metadata for a specific game
+
         :param platform_game_id: A riot esports game ID
         :return: Metadata for a game as a dict
         """
@@ -125,11 +133,10 @@ class BayesEMH(object):
         """
         Gets a list of games which can be filtered using the different function arguments
         If no limit is specified, the function will make multiple requests and return every matched game
+
         :param tags: Only return games containing these tags, as a comma-separated string, or a list
-        :param from_timestamp: Only return games after this moment, can be a unix epoch timestamp as int or float,
-        or a datetime object
-        :param to_timestamp: Only return games before this moment, can be a unix epoch timestamp as int or float,
-        or a datetime object
+        :param from_timestamp: Only return games after this moment, can be a unix epoch timestamp as int or float, or a datetime object
+        :param to_timestamp: Only return games before this moment, can be a unix epoch timestamp as int or float, or a datetime object
         :param limit: Maximum number of games to return
         :param team1: Only return games where this team played, this should be the team tricode
         :param team2: Only return games where this team and team1 played, this should be the team tricode
