@@ -164,15 +164,7 @@ class BayesAPIClient(object):
         data: dict = None,
     ):
         if response.status_code == 401:
-            if not allow_retry:
-                raise UnauthorizedError(response.status_code)
-            return self.sleep_and_retry(
-                method=method,
-                sleeper=sleeper,
-                service=service,
-                data=data,
-                exception=self.make_http_exception_from_status_code(response),
-            )
+            raise UnauthorizedError(response.status_code)
         elif response.status_code == 429:
             if not allow_retry or not self.wait_on_ratelimit:
                 raise TooManyRequests(response.status_code)
