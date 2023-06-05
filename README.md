@@ -1,6 +1,7 @@
 # Bayes LoL Client
 
 This library is used to make queries to the Bayes EMH API, which provides data for League of Legends esports games.
+The (in progress) documentation can be found [here](https://bayes-lol-client.readthedocs.io).
 
 ## Install
 ```
@@ -17,4 +18,4 @@ In order to use the Bayes API, you must have login credentials, which will be pr
 These will be stored in a file in your user config path.
 
 ## EMH Docs
-The full documentation to use EMH can be found [here](https://docs.bayesesports.com/api/emh_riot)
+The full documentation to use EMH can be found [here](https://docs.bayesesports.com/api/emh_riot).
