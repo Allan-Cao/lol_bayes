@@ -11,7 +11,6 @@ sys.path.insert(0, os.path.abspath('../..'))
 project = 'bayes_lol_client'
 copyright = '2022, Santiago Kozak'
 author = 'Santiago Kozak'
-release = '1.0.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -21,7 +20,6 @@ extensions = [
 ]
 
 exclude_patterns = []
-
 
 
 # -- Options for HTML output -------------------------------------------------
