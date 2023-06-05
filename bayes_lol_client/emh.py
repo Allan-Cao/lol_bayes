@@ -9,7 +9,7 @@ from datetime import datetime
 class BayesEMH(object):
     """
     This class makes requests to the /emh/v1 endpoint in the Bayes API.
-    Useful to get summary/details/replay files for professional games
+    Useful to get summary/details/replay files of professional games
     """
 
     endpoint = "https://lolesports-api.bayesesports.com/emh/v1/"
@@ -46,7 +46,7 @@ class BayesEMH(object):
         Returns the game details (timeline) as a json file
 
         :param platform_game_id: A Riot esports game ID
-        :return: The game details as a json file
+        :return: The game details (timeline) as a json file
         """
         return self.get_asset(platform_game_id, "GAMH_DETAILS").json()
 
@@ -132,7 +132,7 @@ class BayesEMH(object):
         max_page_size: Optional[int] = None,
     ) -> list:
         """
-        Gets a list of games which can be filtered using the different function arguments
+        Gets a list of games which can be filtered using the different function parameters
         If no limit is specified, the function will make multiple requests and return every matched game
 
         :param tags: Only return games containing these tags, as a comma-separated string, or a list

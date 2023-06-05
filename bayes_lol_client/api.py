@@ -160,6 +160,7 @@ class BayesAPIClient(object):
             endpoint=endpoint,
         )
 
+    # TODO: I think this should be in utils so we can use it when downloading game assets as well
     def handle_response(
         self,
         sleeper: Sleeper,

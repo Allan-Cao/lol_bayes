@@ -15,6 +15,10 @@ from datetime import datetime
 import pytz
 
 
+# Currently we use requests raise_for_status func to raise an exception if the request fails
+# I think we should instead use our function handle_response to return errors defined in
+# errors.py if possible. That way it would be easier to catch stuff like an asset that
+# couldn't be found or a ratelimit
 def download_game_asset(
     api: BayesAPIClient, asset_url: str, sleeper: Sleeper = None
 ) -> Response:
