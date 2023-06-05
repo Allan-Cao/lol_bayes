@@ -145,13 +145,14 @@ class BayesAPIClient(object):
         sleeper: Sleeper,
         method: str,
         service: str,
+        endpoint: str,
         data: dict = None,
         exception: Exception = None,
         sleep_time: int = None,
     ):
         sleeper.sleep(exception, sleep_time)
         return self.do_api_call(
-            method, service, data, ensure_login=False, sleeper=sleeper
+            method, service, data, ensure_login=False, sleeper=sleeper, endpoint=endpoint
         )
 
     def handle_response(
@@ -161,6 +162,7 @@ class BayesAPIClient(object):
         method: str,
         service: str,
         allow_retry: bool,
+        endpoint: str,
         data: dict = None,
     ):
         if response.status_code == 401:
@@ -179,6 +181,7 @@ class BayesAPIClient(object):
                 data=data,
                 exception=self.make_http_exception_from_status_code(response),
                 sleep_time=sleep_time,
+                endpoint=endpoint
             )
         elif response.status_code == 404:
             raise NotFoundError(response.status_code)
@@ -191,6 +194,7 @@ class BayesAPIClient(object):
                 service=service,
                 data=data,
                 exception=self.make_http_exception_from_status_code(response),
+                endpoint=endpoint
             )
         elif 499 >= response.status_code >= 400:
             raise ClientError(response.status_code)
@@ -231,7 +235,7 @@ class BayesAPIClient(object):
             if not allow_retry:
                 raise e
             return self.sleep_and_retry(
-                method=method, sleeper=sleeper, service=service, data=data, exception=e
+                method=method, sleeper=sleeper, service=service, data=data, exception=e, endpoint=endpoint
             )
 
         return self.handle_response(
@@ -241,4 +245,5 @@ class BayesAPIClient(object):
             sleeper=sleeper,
             response=response,
             allow_retry=allow_retry,
+            endpoint=endpoint
         )
