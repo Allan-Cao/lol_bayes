@@ -63,14 +63,24 @@ def test_get_game_list():
     assert isinstance(resp, list)
     resp = bayes_emh.get_games_list(from_timestamp=from_timestamp_date, limit=1000)
     assert isinstance(resp, list)
-    resp = bayes_emh.get_games_list(from_timestamp=from_timestamp_int, to_timestamp=to_timestamp_date, limit=10)
+    resp = bayes_emh.get_games_list(
+        from_timestamp=from_timestamp_int, to_timestamp=to_timestamp_date, limit=10
+    )
     assert isinstance(resp, list)
-    resp = bayes_emh.get_games_list(from_timestamp=from_timestamp_date, to_timestamp=to_timestamp_float, limit=10)
+    resp = bayes_emh.get_games_list(
+        from_timestamp=from_timestamp_date, to_timestamp=to_timestamp_float, limit=10
+    )
     assert isinstance(resp, list)
-    resp = bayes_emh.get_games_list(from_timestamp=from_timestamp_float, to_timestamp=to_timestamp_int, limit=10)
+    resp = bayes_emh.get_games_list(
+        from_timestamp=from_timestamp_float, to_timestamp=to_timestamp_int, limit=10
+    )
     assert isinstance(resp, list)
-    resp = bayes_emh.get_games_list(from_timestamp=from_timestamp_float, to_timestamp=to_timestamp_int, tags=tags,
-                                    limit=10)
+    resp = bayes_emh.get_games_list(
+        from_timestamp=from_timestamp_float,
+        to_timestamp=to_timestamp_int,
+        tags=tags,
+        limit=10,
+    )
     assert isinstance(resp, list)
     resp = bayes_emh.get_games_list(tags=tags, limit=10)
     assert isinstance(resp, list)

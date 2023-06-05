@@ -11,6 +11,7 @@ class BayesEMH(object):
     This class makes requests to the /emh/v1 endpoint in the Bayes API.
     Useful to get summary/details/replay files for professional games
     """
+
     endpoint = "https://lolesports-api.bayesesports.com/emh/v1/"
     DEFAULT_MAX_PAGE_SIZE = 500
 
