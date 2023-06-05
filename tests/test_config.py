@@ -1,6 +1,7 @@
 import bayes_lol_client
 from datetime import datetime
 import pytz
+import pytest
 
 sample_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT03_2052838"]
 sample_replay_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT02_3130581"]
@@ -8,28 +9,28 @@ sample_replay_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT02_3130581"]
 bayes_emh = bayes_lol_client.BayesEMH()
 
 
-def test_get_game_summary():
-    for sample_id in sample_ids:
-        resp = bayes_emh.get_game_summary(sample_id)
-        assert isinstance(resp, dict)
+@pytest.mark.parametrize("sample_id", sample_ids)
+def test_get_game_summary(sample_id):
+    resp = bayes_emh.get_game_summary(sample_id)
+    assert isinstance(resp, dict)
 
 
-def test_get_game_details():
-    for sample_id in sample_ids:
-        resp = bayes_emh.get_game_details(sample_id)
-        assert isinstance(resp, dict)
+@pytest.mark.parametrize("sample_id", sample_ids)
+def test_get_game_details(sample_id):
+    resp = bayes_emh.get_game_details(sample_id)
+    assert isinstance(resp, dict)
 
 
-def test_get_game_replay():
-    for sample_id in sample_replay_ids:
-        resp = bayes_emh.get_game_replay(sample_id)
-        assert isinstance(resp, bytes)
+@pytest.mark.parametrize("sample_id", sample_replay_ids)
+def test_get_game_replay(sample_id):
+    resp = bayes_emh.get_game_replay(sample_id)
+    assert isinstance(resp, bytes)
 
 
-def test_get_game_data():
-    for sample_id in sample_ids:
-        resp = bayes_emh.get_game_data(sample_id)
-        assert isinstance(resp, tuple)
+@pytest.mark.parametrize("sample_id", sample_ids)
+def test_get_game_data(sample_id):
+    resp = bayes_emh.get_game_data(sample_id)
+    assert isinstance(resp, tuple)
 
 
 def test_get_tags_list():
@@ -42,10 +43,10 @@ def test_get_games_info():
     assert isinstance(resp, dict)
 
 
-def test_get_game_info():
-    for sample_id in sample_ids:
-        resp = bayes_emh.get_game_info(sample_id)
-        assert isinstance(resp, dict)
+@pytest.mark.parametrize("sample_id", sample_ids)
+def test_get_game_info(sample_id):
+    resp = bayes_emh.get_game_info(sample_id)
+    assert isinstance(resp, dict)
 
 
 def test_get_game_list():
