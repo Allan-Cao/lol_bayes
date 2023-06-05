@@ -135,8 +135,10 @@ class BayesEMH(object):
         If no limit is specified, the function will make multiple requests and return every matched game
 
         :param tags: Only return games containing these tags, as a comma-separated string, or a list
-        :param from_timestamp: Only return games after this moment, can be a unix epoch timestamp as int or float, or a datetime object
-        :param to_timestamp: Only return games before this moment, can be a unix epoch timestamp as int or float, or a datetime object
+        :param from_timestamp: Only return games after this moment, can be a unix epoch timestamp as int or float, or a
+        datetime object
+        :param to_timestamp: Only return games before this moment, can be a unix epoch timestamp as int or float, or a
+        datetime object
         :param limit: Maximum number of games to return
         :param team1: Only return games where this team played, this should be the team tricode
         :param team2: Only return games where this team and team1 played, this should be the team tricode
