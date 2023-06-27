@@ -8,18 +8,18 @@ class ClientError(Exception):
 
 
 class NotFoundError(ClientError):
-    """The resource was not found"""
+    """The server cannot find the requested resource"""
     pass
 
 
 class TooManyRequests(ClientError):
-    """There were too many requests to the API"""
+    """The user has sent too many requests to the server in a given amount of time"""
     pass
 
 
 class UnauthorizedError(ClientError):
-    # TODO: this could be wrong
-    """The user is unauthorized to access a resource in the API"""
+    """The client request has not been completed because it lacks valid authentication credentials for the requested
+    resource"""
     pass
 
 
