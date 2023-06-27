@@ -14,6 +14,7 @@ jobs:
     env:
       USERNAME: ${{secrets.USERNAME}}
       PASSWORD: ${{secrets.PASSWORD}}
+      USE_ENVIRONMENT_CREDENTIALS: true
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
