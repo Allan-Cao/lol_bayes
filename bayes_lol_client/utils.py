@@ -31,8 +31,13 @@ def download_game_asset(
         ReadTimeout,
         HTTPError,
     ) as e:
-        return api.sleep_and_retry(sleeper=sleeper, callback=download_game_asset, exception=e, api=api,
-                                   asset_url=asset_url)
+        return api.sleep_and_retry(
+            sleeper=sleeper,
+            callback=download_game_asset,
+            exception=e,
+            api=api,
+            asset_url=asset_url,
+        )
     return api.handle_response(
         sleeper=sleeper,
         response=response,
@@ -40,7 +45,7 @@ def download_game_asset(
         callback=download_game_asset,
         api=api,
         asset_url=asset_url,
-        return_json=False
+        return_json=False,
     )
 
 

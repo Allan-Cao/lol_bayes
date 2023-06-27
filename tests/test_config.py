@@ -8,7 +8,9 @@ sample_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT03_2052838"]
 sample_replay_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT02_3130581"]
 
 if os.environ.get("USE_ENVIRONMENT_CREDENTIALS"):
-    bayes_emh = bayes_lol_client.BayesEMH(username=os.environ["USERNAME"], password=os.environ["PASSWORD"])
+    bayes_emh = bayes_lol_client.BayesEMH(
+        username=os.environ["USERNAME"], password=os.environ["PASSWORD"]
+    )
 else:
     bayes_emh = bayes_lol_client.BayesEMH()
 

@@ -142,11 +142,11 @@ class BayesAPIClient(object):
 
     @staticmethod
     def sleep_and_retry(
-            sleeper: Sleeper,
-            callback: Callable,
-            exception: Exception = None,
-            sleep_time: int = None,
-            **kwargs
+        sleeper: Sleeper,
+        callback: Callable,
+        exception: Exception = None,
+        sleep_time: int = None,
+        **kwargs,
     ):
         sleeper.sleep(exception, sleep_time)
         return callback(
@@ -155,13 +155,13 @@ class BayesAPIClient(object):
         )
 
     def handle_response(
-            self,
-            sleeper: Sleeper,
-            response: requests.Response,
-            allow_retry: bool,
-            callback: Callable,
-            return_json: bool = True,
-            **kwargs,
+        self,
+        sleeper: Sleeper,
+        response: requests.Response,
+        allow_retry: bool,
+        callback: Callable,
+        return_json: bool = True,
+        **kwargs,
     ):
         if response.status_code == 401:
             raise UnauthorizedError(response.status_code)
@@ -172,7 +172,7 @@ class BayesAPIClient(object):
                 sleeper=sleeper,
                 exception=self.make_http_exception_from_status_code(response),
                 callback=callback,
-                **kwargs
+                **kwargs,
             )
         elif response.status_code == 404:
             raise NotFoundError(response.status_code)
@@ -183,7 +183,7 @@ class BayesAPIClient(object):
                 sleeper=sleeper,
                 exception=self.make_http_exception_from_status_code(response),
                 callback=callback,
-                **kwargs
+                **kwargs,
             )
         elif 499 >= response.status_code >= 400:
             raise ClientError(response.status_code)
@@ -232,7 +232,7 @@ class BayesAPIClient(object):
                 service=service,
                 data=data,
                 endpoint=endpoint,
-                ensure_login=False
+                ensure_login=False,
             )
 
         return self.handle_response(
@@ -244,5 +244,5 @@ class BayesAPIClient(object):
             allow_retry=allow_retry,
             endpoint=endpoint,
             callback=self.do_api_call,
-            ensure_login=False
+            ensure_login=False,
         )
