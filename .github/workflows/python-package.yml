@@ -11,7 +11,9 @@ on:
 
 jobs:
   build:
-
+    env:
+      USERNAME: ${{secrets.USERNAME}}
+      PASSWORD: ${{secrets.PASSWORD}}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false

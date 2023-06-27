@@ -2,11 +2,15 @@ import bayes_lol_client
 from datetime import datetime
 import pytz
 import pytest
+import os
 
 sample_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT03_2052838"]
 sample_replay_ids = ["ESPORTSTMNT01_3268705", "ESPORTSTMNT02_3130581"]
 
-bayes_emh = bayes_lol_client.BayesEMH()
+if "USERNAME" in os.environ:
+    bayes_emh = bayes_lol_client.BayesEMH(username=os.environ["USERNAME"], password=os.environ["PASSWORD"])
+else:
+    bayes_emh = bayes_lol_client.BayesEMH()
 
 
 @pytest.mark.parametrize("sample_id", sample_ids)
