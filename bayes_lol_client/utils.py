@@ -15,10 +15,6 @@ from datetime import datetime
 import pytz
 
 
-# Currently we use requests raise_for_status func to raise an exception if the request fails
-# I think we should instead use our function handle_response to return errors defined in
-# errors.py if possible. That way it would be easier to catch stuff like an asset that
-# couldn't be found or a ratelimit
 def download_game_asset(
     api: BayesAPIClient, asset_url: str, sleeper: Sleeper = None
 ) -> Response:
@@ -35,9 +31,17 @@ def download_game_asset(
         ReadTimeout,
         HTTPError,
     ) as e:
-        sleeper.sleep(exception=e)
-        return download_game_asset(api=api, asset_url=asset_url, sleeper=sleeper)
-    return response
+        return api.sleep_and_retry(sleeper=sleeper, callback=download_game_asset, exception=e, api=api,
+                                   asset_url=asset_url)
+    return api.handle_response(
+        sleeper=sleeper,
+        response=response,
+        allow_retry=True,
+        callback=download_game_asset,
+        api=api,
+        asset_url=asset_url,
+        return_json=False
+    )
 
 
 def get_list(

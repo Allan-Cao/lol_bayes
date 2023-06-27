@@ -11,7 +11,7 @@ import json
 from datetime import datetime, timedelta
 import os
 from bayes_lol_client.sleep import Sleepers, Sleeper
-from typing import NoReturn, Any
+from typing import NoReturn, Any, Callable
 from bayes_lol_client.errors import (
     ClientError,
     ServerError,
@@ -140,54 +140,39 @@ class BayesAPIClient(object):
             f"{response.status_code} for url {response.url}", response=response
         )
 
+    @staticmethod
     def sleep_and_retry(
-        self,
-        sleeper: Sleeper,
-        method: str,
-        service: str,
-        endpoint: str,
-        data: dict = None,
-        exception: Exception = None,
-        sleep_time: int = None,
+            sleeper: Sleeper,
+            callback: Callable,
+            exception: Exception = None,
+            sleep_time: int = None,
+            **kwargs
     ):
         sleeper.sleep(exception, sleep_time)
-        return self.do_api_call(
-            method,
-            service,
-            data,
-            ensure_login=False,
+        return callback(
+            **kwargs,
             sleeper=sleeper,
-            endpoint=endpoint,
         )
 
-    # TODO: I think this should be in utils so we can use it when downloading game assets as well
     def handle_response(
-        self,
-        sleeper: Sleeper,
-        response: requests.Response,
-        method: str,
-        service: str,
-        allow_retry: bool,
-        endpoint: str,
-        data: dict = None,
+            self,
+            sleeper: Sleeper,
+            response: requests.Response,
+            allow_retry: bool,
+            callback: Callable,
+            return_json: bool = True,
+            **kwargs,
     ):
         if response.status_code == 401:
             raise UnauthorizedError(response.status_code)
         elif response.status_code == 429:
             if not allow_retry or not self.wait_on_ratelimit:
                 raise TooManyRequests(response.status_code)
-            if "x-rate-limit-retry-after-seconds" in response.headers:
-                sleep_time = int(response.headers["x-rate-limit-retry-after-seconds"])
-            else:
-                sleep_time = None
             return self.sleep_and_retry(
-                method=method,
                 sleeper=sleeper,
-                service=service,
-                data=data,
                 exception=self.make_http_exception_from_status_code(response),
-                sleep_time=sleep_time,
-                endpoint=endpoint,
+                callback=callback,
+                **kwargs
             )
         elif response.status_code == 404:
             raise NotFoundError(response.status_code)
@@ -195,24 +180,23 @@ class BayesAPIClient(object):
             if not allow_retry:
                 raise ServerError(response.status_code)
             return self.sleep_and_retry(
-                method=method,
                 sleeper=sleeper,
-                service=service,
-                data=data,
                 exception=self.make_http_exception_from_status_code(response),
-                endpoint=endpoint,
+                callback=callback,
+                **kwargs
             )
         elif 499 >= response.status_code >= 400:
             raise ClientError(response.status_code)
         response.raise_for_status()
-        return response.json()
+        if return_json:
+            return response.json()
+        return response
 
     def do_api_call(
         self,
         method: str,
         service: str,
         data: dict = None,
-        *,
         allow_retry: bool = True,
         ensure_login: bool = True,
         sleeper: Sleeper = None,
@@ -241,12 +225,14 @@ class BayesAPIClient(object):
             if not allow_retry:
                 raise e
             return self.sleep_and_retry(
-                method=method,
                 sleeper=sleeper,
+                exception=e,
+                callback=self.do_api_call,
+                method=method,
                 service=service,
                 data=data,
-                exception=e,
                 endpoint=endpoint,
+                ensure_login=False
             )
 
         return self.handle_response(
@@ -257,4 +243,6 @@ class BayesAPIClient(object):
             response=response,
             allow_retry=allow_retry,
             endpoint=endpoint,
+            callback=self.do_api_call,
+            ensure_login=False
         )
