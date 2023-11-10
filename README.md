@@ -4,10 +4,10 @@ This library (WIP) provides an interface to make queries to the Bayes V2 API, wh
 <!-- The (in progress) documentation can be found [here](). -->
 
 ## TODO:
-- [] Support V2 API Authentication
-- [] Deploy read the docs
-- [] Rewrite EMH/Historic classes to support the new merged endpoints
-- [] Rewrite tests
+- [ ] Support V2 API Authentication
+- [ ] Deploy read the docs
+- [ ] Rewrite EMH/Historic classes to support the new merged endpoints
+- [ ] Rewrite tests
 
 ## Install
 ```
